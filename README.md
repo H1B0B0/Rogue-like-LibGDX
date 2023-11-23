@@ -6,6 +6,7 @@ The Rogue-like LibGDX project is an engaging Rogue-like game developed with LibG
 
 ### Key Features
 
+
 - Procedural Level Generation: The game intelligently generates levels based on the player's progress, ensuring a unique and challenging environment in each playthrough.
 
 - Diverse Items: Encounter a variety of items, including weapons, powers, and healing items, each with a percentage-based drop rate. The dynamic loot system adds an element of unpredictability to the gameplay.
