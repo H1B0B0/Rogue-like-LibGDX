@@ -28,7 +28,7 @@ The Rogue-like LibGDX project is an engaging Rogue-like game developed with LibG
 
 Make sure you have the following installed and set up on your machine:
 
-- [Java](https://www.java.com/) (recommended version)
+- [Java](https://www.java.com/)
 - [LibGDX](https://libgdx.badlogicgames.com/)
 
 ## How to Use
