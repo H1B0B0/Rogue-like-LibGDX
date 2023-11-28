@@ -24,11 +24,13 @@ jobs:
         server-id: github
         settings-path: ${{ github.workspace }}
 
+    - name: Make Gradlew executable
+      run: chmod +x gradlew
+
     - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
       with:
         arguments: build
-
 
     - name: Publish to GitHub Packages
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
