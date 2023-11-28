@@ -1,7 +1,8 @@
 package com.pedagoquest.game;
+
 import com.badlogic.gdx.Game;
 
-public class GameController extends Game{
+public class GameController extends Game {
 
     @Override
     public void create() {

@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.math.Rectangle;
 
 public class Ennemy {
     private String name;
@@ -109,8 +108,9 @@ public class Ennemy {
     }
 
     public void resolveCollision(Character character) {
-    // Define the minimum allowed distance (the sum of the radii of character and enemy)
-        float minDistance =(character.getWidth() / 4);
+        // Define the minimum allowed distance (the sum of the radii of character and
+        // enemy)
+        float minDistance = (character.getWidth() / 4);
 
         // Calculate the distance between the enemy and the character
         float distance = Vector2.dst(this.x, this.y, character.getX(), character.getY());
@@ -127,7 +127,7 @@ public class Ennemy {
             // Move the enemy away from the character by the overlap amount
             this.x -= overlap * direction.x;
             this.y -= overlap * direction.y;
-        }   
+        }
     }
 
     public void update(float deltaTime, Character character) {
@@ -136,11 +136,11 @@ public class Ennemy {
 
         resolveCollision(character);
 
-        //check if the enemy is in range of the player
+        // check if the enemy is in range of the player
         if (direction.len() > 1) {
             direction.nor();
-    
-            //change position of the enemy
+
+            // change position of the enemy
             x += (x = direction.x * speed * deltaTime);
             y += (y = direction.y * speed * deltaTime);
 
@@ -261,7 +261,7 @@ public class Ennemy {
     }
 
     public int getExperience() {
-        int experience = MathUtils.random(10, 30)*level;
+        int experience = MathUtils.random(10, 30) * level;
         return experience;
     }
 
@@ -270,7 +270,7 @@ public class Ennemy {
     }
 
     public int getDamage() {
-        this.damage = strength*10+level*5;
+        this.damage = strength * 10 + level * 5;
         return this.damage;
     }
 

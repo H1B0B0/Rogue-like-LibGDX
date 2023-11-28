@@ -1,12 +1,10 @@
 package com.pedagoquest.game;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
@@ -73,8 +71,6 @@ public class GameScreen implements Screen {
             "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\Stats\\Gold.png");
     private Texture floor = new Texture(
             "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\Stats\\Floor.png");
-    private Texture cross = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\Stats\\Cross.png");
     private Texture damageTexture = new Texture(
             "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\Stats\\Attack.png");
     private Texture shopPanel = new Texture(
@@ -104,8 +100,6 @@ public class GameScreen implements Screen {
             "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\shop4x.png");
     private Texture Healthpotion = new Texture(
             "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\Conso_1.png");
-    private Texture speedIcon = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\tile158.png");
     private Texture VisionIcon = new Texture(
             "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\eye_fire1.png");
     private TextureRegion[][] attackFrames;
@@ -195,7 +189,7 @@ public class GameScreen implements Screen {
     }
 
     private void initBossLevel() {
-        levelGenerator = new LevelGenerator(600, 1200, 3000, 3000);
+        levelGenerator = new LevelGenerator(400, 600, 3000, 3000);
         currentLevel = levelGenerator.generateLevel(1, ground, walls);
         bosslevel = true;
         bossSpawned = false;

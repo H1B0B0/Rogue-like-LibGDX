@@ -9,7 +9,7 @@ public class DesktopLauncher {
     public static void main(String[] arg) {
         DisplayMode primaryMode = Lwjgl3ApplicationConfiguration.getDisplayMode();
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setForegroundFPS(120);
+        config.setForegroundFPS(360);
         config.setTitle("PedagoQuest");
         config.setFullscreenMode(primaryMode);
         new Lwjgl3Application(new GameController(), config);
