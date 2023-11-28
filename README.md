@@ -2,7 +2,7 @@
 
 ## Description
 
-The Rogue-like LibGDX project is an engaging Rogue-like game developed with LibGDX, where the game map is dynamically generated using procedural methods, providing an infinite and ever-evolving gaming experience.
+The Rogue-like LibGDX project is an immersive Rogue-like game meticulously crafted with LibGDX. Faced with the challenge of a tight deadline—only two weeks for development—this project showcases the team's commitment and proficiency in delivering a captivating gaming experience. The game features dynamically generated maps using procedural methods, ensuring an infinite and ever-evolving adventure for players.
 
 ### Key Features
 
