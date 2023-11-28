@@ -36,7 +36,6 @@ public class PedagoQuest extends Game {
         OrthographicCamera camera = new OrthographicCamera();
         control = new Control(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
         Gdx.input.setInputProcessor(control);
-        this.setScreen(new GameScreen());
     }
     
     @Override

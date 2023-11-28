@@ -64,4 +64,9 @@ public class Boss extends Ennemy {
         return 100*getLevel();
     }
 
+    @Override
+    public int getDamage() {
+        return (3*getStrength())+(getLevel()*10);
+    }
+
 }

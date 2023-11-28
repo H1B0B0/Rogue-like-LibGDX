@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Ennemy {
     private String name;
@@ -22,7 +23,7 @@ public class Ennemy {
     private int armor;
     private float x;
     private float y;
-    private boolean isAlive; // Texture for the enemy sprite
+    private boolean isAlive;
     private float speed;
     protected Animation<TextureRegion> walkUpAnimation;
     protected Animation<TextureRegion> walkDownAnimation;
@@ -32,6 +33,7 @@ public class Ennemy {
     private float stateTime;
     private boolean isHit;
     private float hitTimer;
+    private Rectangle bounds;
 
     public Ennemy(String name, int level, int health, int mana, int strength, int dexterity, int intelligence,
             int critRate, int armor, int x, int y, float speed) {
@@ -50,8 +52,6 @@ public class Ennemy {
         this.speed = speed;
         this.name = name;
         this.level = level;
-        // ... other initializations ...
-
         Texture enemySprite;
         TextureRegion[][] tmpFrames;
 
@@ -108,14 +108,39 @@ public class Ennemy {
         }
     }
 
+    public void resolveCollision(Character character) {
+    // Define the minimum allowed distance (the sum of the radii of character and enemy)
+        float minDistance =(character.getWidth() / 4);
+
+        // Calculate the distance between the enemy and the character
+        float distance = Vector2.dst(this.x, this.y, character.getX(), character.getY());
+
+        // If the distance is less than the minimum distance, resolve the collision
+        if (distance < minDistance) {
+            // Calculate the overlap amount
+            float overlap = minDistance - distance;
+
+            // Calculate the direction vector from the enemy to the character
+            Vector2 direction = new Vector2(character.getX() - this.x, character.getY() - this.y);
+            direction.nor(); // Normalize to get the direction only
+
+            // Move the enemy away from the character by the overlap amount
+            this.x -= overlap * direction.x;
+            this.y -= overlap * direction.y;
+        }   
+    }
+
     public void update(float deltaTime, Character character) {
-        // Calcul de la direction de l'ennemi
+        // Calculate the direction vector from the enemy to the character
         Vector2 direction = new Vector2(character.getX() - x, character.getY() - y);
-        // regarder si le personnage est dans le rayon de l'ennemi
+
+        resolveCollision(character);
+
+        //check if the enemy is in range of the player
         if (direction.len() > 1) {
             direction.nor();
-
-            // Changement de la position de l'ennemi
+    
+            //change position of the enemy
             x += (x = direction.x * speed * deltaTime);
             y += (y = direction.y * speed * deltaTime);
 
@@ -142,31 +167,28 @@ public class Ennemy {
                 }
             }
         } else {
-            // If the enemy is not moving, you can set a default frame or idle animation
-            currentFrame = walkDownAnimation.getKeyFrame(0, true); // Example: Default to the first frame of walking
-                                                                   // down
+            currentFrame = walkDownAnimation.getKeyFrame(0, true);
         }
 
         stateTime += deltaTime;
     }
 
+    // Take damage
     public void takeDamage(int damage) {
         this.health -= damage;
         if (this.health <= 0) {
             isAlive = false;
         } else {
             isHit = true;
-            hitTimer = 0.1f; // Hit effect lasts for 0.2 seconds
+            hitTimer = 0.1f;
         }
     }
 
-    // Add a method to get the enemy's bounding box
     public Rectangle getBounds() {
         if (currentFrame != null) {
             return new Rectangle(x, y, currentFrame.getRegionWidth(), currentFrame.getRegionHeight());
         }
         return new Rectangle(x, y, 32, 32);
-        // Return an empty rectangle if no current frame is set
     }
 
     // #region Getters and Setters
@@ -239,7 +261,7 @@ public class Ennemy {
     }
 
     public int getExperience() {
-        int experience = MathUtils.random(10, 50) * level;
+        int experience = MathUtils.random(10, 30)*level;
         return experience;
     }
 
@@ -248,7 +270,7 @@ public class Ennemy {
     }
 
     public int getDamage() {
-        this.damage = strength * level;
+        this.damage = strength*10+level*5;
         return this.damage;
     }
 

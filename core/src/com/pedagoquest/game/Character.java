@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -66,6 +67,12 @@ public class Character {
     private Color levelUpColor = new Color(1, 1, 0, 1);
     private boolean isFlashing = false;
     private Color flashingColor = new Color(1, 1, 1, 0.5f); // White color with some transparency
+    private Sound deathSound = Gdx.audio.newSound(
+            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\burning.mp3"));
+    private Sound Stepsound = Gdx.audio.newSound(
+            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\step.mp3"));
+    private int stepCounter = 0;
+    private int stepsPerSound = 23;
 
     public Character() {
         position = new Vector2(0, 0);
@@ -299,21 +306,41 @@ public class Character {
         if (control.up) {
             previousY = position.y; // Store the previous Y position before updating
             position.y += speed * deltaTime;
+            stepCounter++;
+            if (stepCounter >= stepsPerSound) {
+                Stepsound.play(0.5f);
+                stepCounter = 0;
+            }
             currentFrame = walkUpAnimation.getKeyFrame(stateTime, true);
             this.bounds.setPosition(this.position.x, this.position.y);
         } else if (control.down) {
             previousY = position.y; // Store the previous Y position before updating
             position.y -= speed * deltaTime;
+            stepCounter++;
+            if (stepCounter >= stepsPerSound) {
+                Stepsound.play(0.5f);
+                stepCounter = 0;
+            }
             currentFrame = walkDownAnimation.getKeyFrame(stateTime, true);
             this.bounds.setPosition(this.position.x, this.position.y);
         } else if (control.left) {
             previousX = position.x; // Store the previous X position before updating
             position.x -= speed * deltaTime;
+            stepCounter++;
+            if (stepCounter >= stepsPerSound) {
+                Stepsound.play(0.5f);
+                stepCounter = 0;
+            }
             currentFrame = walkLeftAnimation.getKeyFrame(stateTime, true);
             this.bounds.setPosition(this.position.x, this.position.y);
         } else if (control.right) {
             previousX = position.x; // Store the previous X position before updating
             position.x += speed * deltaTime;
+            stepCounter++;
+            if (stepCounter >= stepsPerSound) {
+                Stepsound.play(0.5f);
+                stepCounter = 0;
+            }
             currentFrame = walkRightAnimation.getKeyFrame(stateTime, true);
             this.bounds.setPosition(this.position.x, this.position.y);
         } else {
@@ -611,6 +638,7 @@ public class Character {
 
         if (this.health <= 0) {
             this.isAlive = false;
+            deathSound.play();
             System.out.println(this.name + " has died.");
         }
     }

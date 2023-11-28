@@ -26,6 +26,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class GameScreen implements Screen {
@@ -34,7 +37,6 @@ public class GameScreen implements Screen {
     private Level currentLevel;
     private LevelGenerator levelGenerator;
     private Texture texture;
-    private Texture charactTexture;
     private SpriteBatch spriteBatch;
     public TextureRegion ground;
     public TextureRegion ground1;
@@ -86,10 +88,17 @@ public class GameScreen implements Screen {
     private Cursor defaultCursor;
     private int previousLevel;
     private float levelUpTimer = 0;
+    Viewport viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     private boolean displayLevelUp = false;
     private SpriteBatch uiBatch = new SpriteBatch();
     private Sound hitSound = Gdx.audio.newSound(
             Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\hit_slash.mp3"));
+    private Sound BossSound = Gdx.audio.newSound(
+            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\boss.mp3"));
+    private Sound Levelupsound = Gdx.audio.newSound(
+            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\levelup.mp3"));
+    private Sound tpSound = Gdx.audio.newSound(
+            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\door_open.mp3"));
     private boolean shop = false;
     private Texture shopTexture = new Texture(
             "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\shop4x.png");
@@ -100,33 +109,41 @@ public class GameScreen implements Screen {
     private Texture VisionIcon = new Texture(
             "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\eye_fire1.png");
     private TextureRegion[][] attackFrames;
+    private GameController game;
     private Animation<TextureRegion> attackAnimation;
     private float stateTime;
+    private boolean isGameOver = false;
+    private Stage stage;
+    private Texture gameOverTexture;
     private Sprite first_item_texture;
     private Item firstItem;
     private Item secondItem;
     private Sprite second_item_texture;
     private int firstItemPrice;
     private int secondItemPrice;
+    private String basePath;
+    private int number_max_of_upgrade = 0;
+    private int number_of_upgrade_health = 0;
 
-    public GameScreen() {
+    public GameScreen(GameController game, Character character) {
         // Initialize components
         camera = new OrthographicCamera();
         shapeRenderer = new ShapeRenderer();
         spriteBatch = new SpriteBatch();
         enemies = new ArrayList<Ennemy>(); // Initialize the enemies list
+        this.game = game;
+        stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
         // Charger la texture de l'environnement
         init_level_texture();
         // Charger la texture du personnage
         levelGenerator = new LevelGenerator(300, 600, 3000, 3000);
-        charactTexture = new Texture(
-                "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_tristan\\naked\\naked.png");
         initGameLevel();
 
         // Initialize the character and control
-        character = new Character("Tristan", 1, 100, 100, 3, 10, 10, 10, 10, charactTexture);
-        character.setScale(0.5f, 0.5f);
+        this.character = character;
+
+        this.character.setScale(0.5f, 0.5f);
         control = new Control(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
         spawnCharacterInRandomRoom();
         Gdx.input.setInputProcessor(control);
@@ -144,6 +161,8 @@ public class GameScreen implements Screen {
         // Generate the font
         font = generator.generateFont(parameter);
 
+        gameOverTexture = new Texture("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\menu\\deadback.png");
+
         Texture attackTexture = new Texture(Gdx.files.internal(
                 "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\attack\\Retro Impact Effect F.png"));
 
@@ -152,8 +171,6 @@ public class GameScreen implements Screen {
 
         int FRAME_COLS = attackFrames[0].length;
         int FRAME_ROWS = attackFrames.length;
-        System.out.println(attackFrames[0].length);
-        System.out.println(attackFrames.length);
         TextureRegion[] attackAnimationFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
         int index = 0;
         for (int i = 0; i < FRAME_ROWS; i++) {
@@ -162,44 +179,13 @@ public class GameScreen implements Screen {
             }
         }
 
-        attackAnimation = new Animation<>(0.05f, attackAnimationFrames[64], attackAnimationFrames[65],
+        attackAnimation = new Animation<>(0.03f, attackAnimationFrames[64], attackAnimationFrames[65],
                 attackAnimationFrames[66], attackAnimationFrames[67], attackAnimationFrames[68],
                 attackAnimationFrames[69], attackAnimationFrames[70], attackAnimationFrames[71]);
 
         stateTime = 0f;
         firstItem = generateRandomItem(Item.type.COMMON);
         first_item_texture = firstItem.getSprite();
-
-        float shopitem = MathUtils.random(100);
-        if (shopitem >= 99) {
-            firstItem = generateRandomItem(Item.type.LEGENDARY);
-            firstItemPrice = 3000;
-        } else if (shopitem >= 90) {
-            firstItem = generateRandomItem(Item.type.MYTHIC);
-            firstItemPrice = 1800;
-        } else if (shopitem >= 40) {
-            firstItem = generateRandomItem(Item.type.RARE);
-            firstItemPrice = 600;
-        } else {
-            firstItem = generateRandomItem(Item.type.COMMON);
-            firstItemPrice = 100;
-        }
-        shopitem = MathUtils.random(100);
-        if (shopitem >= 99) {
-            secondItem = generateRandomItem(Item.type.LEGENDARY);
-            secondItemPrice = 3000;
-        } else if (shopitem >= 90) {
-            secondItem = generateRandomItem(Item.type.MYTHIC);
-            secondItemPrice = 1800;
-        } else if (shopitem >= 40) {
-            secondItem = generateRandomItem(Item.type.RARE);
-            secondItemPrice = 600;
-        } else {
-            secondItem = generateRandomItem(Item.type.COMMON);
-            secondItemPrice = 100;
-        }
-        first_item_texture = firstItem.getSprite();
-        second_item_texture = secondItem.getSprite();
 
     }
 
@@ -217,8 +203,8 @@ public class GameScreen implements Screen {
 
     private void spawnBoss() {
 
-        int x = (int) character.getX() + MathUtils.random(-300, 300);
-        int y = (int) character.getY() + MathUtils.random(-300, 300);
+        int x = (int) this.character.getX() + MathUtils.random(-300, 300);
+        int y = (int) this.character.getY() + MathUtils.random(-300, 300);
 
         // Use a default boss name if the enemies list is empty
         int randomBossName = MathUtils.random(0, 4);
@@ -242,14 +228,43 @@ public class GameScreen implements Screen {
         }
 
         int bossLevel = 10 * number_of_current_level;
-        int bossHealth = 500 * number_of_current_level;
+        int bossHealth = 500 * number_of_current_level * 2;
         int bossMana = 200;
-        float speed = 20 + number_of_current_level * 0.1f;
+        float speed = 10 + number_of_current_level * 0.3f;
 
         // Create the boss
-        boss = new Boss(bossName, bossLevel, bossHealth, bossMana, 10, 10, 10, 10, 10, x, y, speed);
+        boss = new Boss(bossName, bossLevel, bossHealth, bossMana, 30, 10, 10, 10, 40 * number_of_current_level, x, y,
+                speed);
 
         enemies.add(boss);
+    }
+
+    private void setDefaultCursor() {
+        // Original cursor image
+        Pixmap originalPixmap = new Pixmap(
+                Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\gdx\\cursor_mouse.png"));
+
+        // New dimensions for the cursor
+        int newWidth = 16; // For example, double the original size
+        int newHeight = 32; // For example, double the original size
+
+        // Create a new Pixmap with the new size
+        Pixmap scaledPixmap = new Pixmap(newWidth, newHeight, originalPixmap.getFormat());
+
+        // Draw the original pixmap onto the new one with scaling (resizing)
+        scaledPixmap.drawPixmap(
+                originalPixmap,
+                0, 0, originalPixmap.getWidth(), originalPixmap.getHeight(),
+                0, 0, scaledPixmap.getWidth(), scaledPixmap.getHeight());
+
+        originalPixmap.dispose();
+        int xHotspot = newWidth / 2;
+        int yHotspot = newHeight / 2;
+        Cursor customCursor = Gdx.graphics.newCursor(scaledPixmap, xHotspot, yHotspot);
+
+        // Set the cursor
+        Gdx.graphics.setCursor(customCursor);
+        scaledPixmap.dispose();
     }
 
     private void init_level_texture() {
@@ -314,7 +329,7 @@ public class GameScreen implements Screen {
 
     public void spawnEnemy() {
         // Get the room where the character currently is
-        Room playerRoom = character.getCurrentRoom();
+        Room playerRoom = this.character.getCurrentRoom();
 
         if (playerRoom != null) {
             // Generate a random position within the room
@@ -325,7 +340,7 @@ public class GameScreen implements Screen {
             x = MathUtils.clamp(x, playerRoom.getX() + 1, playerRoom.getX() + playerRoom.getWidth() - 1);
             y = MathUtils.clamp(y, playerRoom.getY() + 1, playerRoom.getY() + playerRoom.getHeight() - 1);
 
-            float EnnemySpeed = 10 + number_of_current_level * 0.1f;
+            float EnnemySpeed = 10 + number_of_current_level * 0.3f;
 
             // Choose enemy type based on the current level
             String enemyType;
@@ -333,35 +348,42 @@ public class GameScreen implements Screen {
             switch (number_of_current_level % 4) {
                 case 0:
                     enemyType = "Gobelin";
-                    Ennemy enemy = new Ennemy(enemyType, level, 30 + level * 10, 100, 2 * number_of_current_level, 10,
-                            10, 10, 10 * number_of_current_level, x, y,
-                            EnnemySpeed);
+                    Ennemy enemy = new Ennemy(enemyType, number_of_current_level, 30 + (level * 30), 100,
+                            2 * number_of_current_level, 10,
+                            10, 10, 10 * number_of_current_level, x, y, EnnemySpeed);
                     enemies.add(enemy);
                     break;
                 case 1:
                     enemyType = "zombie";
-                    Ennemy zombie = new Ennemy(enemyType, level, 50 + level * 10, 100, 2 * number_of_current_level, 10,
+                    Ennemy zombie = new Ennemy(enemyType, number_of_current_level, 50 + (level * 30), 100,
+                            2 * number_of_current_level,
+                            10,
                             10, 10, 10 * number_of_current_level, x, y,
                             EnnemySpeed);
                     enemies.add(zombie);
                     break;
                 case 2:
                     enemyType = "orc";
-                    Ennemy orc = new Ennemy(enemyType, level, 30 + level * 10, 100, 3 * number_of_current_level, 10, 10,
+                    Ennemy orc = new Ennemy(enemyType, number_of_current_level, 30 + (level * 30), 100,
+                            3 * number_of_current_level, 10,
+                            10,
                             10, 10 * number_of_current_level, x, y,
                             EnnemySpeed);
                     enemies.add(orc);
                     break;
                 case 3:
                     enemyType = "squelette";
-                    Ennemy squelette = new Ennemy(enemyType, level, 50 + level * 10, 100, 3 * number_of_current_level,
+                    Ennemy squelette = new Ennemy(enemyType, number_of_current_level, 50 + (level * 30), 100,
+                            3 * number_of_current_level,
                             10, 10, 10, 10 * number_of_current_level, x, y,
                             EnnemySpeed);
                     enemies.add(squelette);
                     break;
                 default:
                     enemyType = "Gobelin"; // Default case, if needed
-                    Ennemy gobelin = new Ennemy(enemyType, level, 50 + level * 10, 100, 2 * number_of_current_level, 10,
+                    Ennemy gobelin = new Ennemy(enemyType, number_of_current_level, 50 + (level * 30), 100,
+                            2 * number_of_current_level,
+                            10,
                             10, 10, 10 * number_of_current_level, x, y,
                             EnnemySpeed);
                     enemies.add(gobelin);
@@ -377,16 +399,16 @@ public class GameScreen implements Screen {
         Room randomRoom = getRandomRoom();
 
         // Définissez les coordonnées du personnage au centre de la salle
-        float characterX = randomRoom.getX() + (randomRoom.getWidth() - character.getWidth()) / 2;
-        float characterY = randomRoom.getY() + (randomRoom.getHeight() - character.getHeight()) / 2;
+        float characterX = randomRoom.getX() + (randomRoom.getWidth() - this.character.getWidth()) / 2;
+        float characterY = randomRoom.getY() + (randomRoom.getHeight() - this.character.getHeight()) / 2;
 
         // Check if the character is within the room boundaries
         characterX = MathUtils.clamp(characterX, randomRoom.getX(),
-                randomRoom.getX() + randomRoom.getWidth() - character.getWidth());
+                randomRoom.getX() + randomRoom.getWidth() - this.character.getWidth());
         characterY = MathUtils.clamp(characterY, randomRoom.getY(),
-                randomRoom.getY() + randomRoom.getHeight() - character.getHeight());
+                randomRoom.getY() + randomRoom.getHeight() - this.character.getHeight());
         // Définissez les nouvelles coordonnées du personnage
-        character.setPosition(characterX, characterY);
+        this.character.setPosition(characterX, characterY);
         exploredRooms.add(currentLevel.getRooms().indexOf(randomRoom));
         if (!bosslevel) {
             shop = true;
@@ -470,10 +492,10 @@ public class GameScreen implements Screen {
     private void checkRoomCollisions(Room room) {
         // Iterate over walls in the room
         for (Rectangle wallBounds : room.getWallBounds()) {
-            if (character.collidesWith(wallBounds)) {
+            if (this.character.collidesWith(wallBounds)) {
                 // Calculate the change in position
-                float deltaX = character.getX() - character.getPreviousX();
-                float deltaY = character.getY() - character.getPreviousY();
+                float deltaX = this.character.getX() - this.character.getPreviousX();
+                float deltaY = this.character.getY() - this.character.getPreviousY();
 
                 // Handle collision - adjust character position
                 adjustCharacterPosition(wallBounds, deltaX, deltaY);
@@ -482,11 +504,11 @@ public class GameScreen implements Screen {
     }
 
     private void adjustCharacterPosition(Rectangle wallBounds, float deltaX, float deltaY) {
-        float characterX = character.getX();
-        float characterY = character.getY();
+        float characterX = this.character.getX();
+        float characterY = this.character.getY();
 
-        float characterWidth = character.getWidth();
-        float characterHeight = character.getHeight();
+        float characterWidth = this.character.getWidth();
+        float characterHeight = this.character.getHeight();
 
         if (deltaX < 0 && characterX < wallBounds.getX() + wallBounds.getWidth()
                 && characterX + characterWidth > wallBounds.getX() + wallBounds.getWidth()) {
@@ -503,7 +525,7 @@ public class GameScreen implements Screen {
         }
 
         // Set the new position for the character
-        character.setPosition(characterX, characterY);
+        this.character.setPosition(characterX, characterY);
     }
 
     private void drawdoor(SpriteBatch spriteBatch, Room room) {
@@ -528,8 +550,8 @@ public class GameScreen implements Screen {
     }
 
     private Room CurrentRoom() {
-        float characterX = character.getX();
-        float characterY = character.getY();
+        float characterX = this.character.getX();
+        float characterY = this.character.getY();
 
         for (Room room : currentLevel.getRooms()) {
             if (characterX >= room.getX() && characterX < room.getX() + room.getWidth() &&
@@ -542,17 +564,18 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        previousLevel = character.getLevel();
+        setDefaultCursor();
+        previousLevel = this.character.getLevel();
     }
 
     private void update(float delta) {
         // Update the character
         Room currentRoom = CurrentRoom();
-        if (currentRoom != null && !currentRoom.equals(character.getCurrentRoom())) {
+        if (currentRoom != null && !currentRoom.equals(this.character.getCurrentRoom())) {
             int roomIndex = currentLevel.getRooms().indexOf(currentRoom);
             if (!exploredRooms.contains(roomIndex)) {
                 // The room is being entered for the first time
-                character.setCurrentRoom(currentRoom);
+                this.character.setCurrentRoom(currentRoom);
                 exploredRooms.add(roomIndex);
 
                 // Spawn enemies for the new room
@@ -574,11 +597,11 @@ public class GameScreen implements Screen {
         }
 
         for (Room room : currentLevel.getRooms()) {
-            if (characterOverlapsWithDoor(character, room)) {
+            if (characterOverlapsWithDoor(this.character, room)) {
                 if (room.isExplored()) {
                     continue;
                 } else {
-                    teleportCharacterToRandomRoom(character, currentLevel.getRooms(), exploredRooms);
+                    teleportCharacterToRandomRoom(this.character, currentLevel.getRooms(), exploredRooms);
                     isGenerated = false;
                     break;
                 }
@@ -586,13 +609,14 @@ public class GameScreen implements Screen {
         }
 
         for (Ennemy enemy : enemies) {
-            enemy.update(delta, character);
+            enemy.update(delta, this.character);
 
             float attackRange = 10;
-            float distanceToPlayer = Vector2.dst(enemy.getX(), enemy.getY(), character.getX(), character.getY());
+            float distanceToPlayer = Vector2.dst(enemy.getX(), enemy.getY(), this.character.getX(),
+                    this.character.getY());
 
             if (boss != null && boss.isAlive()) {
-                boss.update(delta, character);
+                boss.update(delta, this.character);
             }
 
             if (distanceToPlayer <= attackRange) {
@@ -600,7 +624,7 @@ public class GameScreen implements Screen {
             }
 
             if (boss != null && boss.isAlive()) {
-                boss.update(delta, character);
+                boss.update(delta, this.character);
 
                 float bossAttackRange = 10;
                 if (distanceToPlayer <= bossAttackRange) {
@@ -609,14 +633,14 @@ public class GameScreen implements Screen {
             }
             // Update the boss if it's alive and part of the game
             if (boss != null && boss.isAlive()) {
-                boss.update(delta, character);
+                boss.update(delta, this.character);
             }
         }
     }
 
     private void attackPlayer(Ennemy attacker) {
         int damage = attacker.getDamage();
-        character.takeDamage(damage);
+        this.character.takeDamage(damage);
         // System.out.println("Attacking player. Player health: " +
         // character.getHealth());
     }
@@ -636,6 +660,7 @@ public class GameScreen implements Screen {
         if (!exploredRooms.contains(newRoomIndex)) {
             System.out.println("added to explored rooms");
             exploredRooms.add(newRoomIndex);
+            tpSound.play(1f);
             character.setPosition(newRoom.getX() + newRoom.getWidth() / 2, newRoom.getY() + newRoom.getHeight() / 2);
             character.setCurrentRoom(newRoom);
             shop = false;
@@ -672,23 +697,24 @@ public class GameScreen implements Screen {
             reset_explored_rooms();
             System.out.println(exploredRooms.size());
             initBossLevel();
-            LastVsision = character.getVision();
-            character.setVision(900);
+            LastVsision = this.character.getVision();
+            this.character.setVision(900);
             spawnCharacterInRandomRoom();
             bosslevel = true;
+            BossSound.play(0.7f);
         } else {
             try {
                 System.out.println("new level");
                 doorspawned = false;
                 reset_explored_rooms();
                 float shopitem = MathUtils.random(100);
-                if (shopitem >= 99) {
+                if (shopitem >= 99 - (number_of_current_level / 50)) {
                     firstItem = generateRandomItem(Item.type.LEGENDARY);
-                    firstItemPrice = 3000;
-                } else if (shopitem >= 90) {
+                    firstItemPrice = 8000 * number_of_current_level;
+                } else if (shopitem >= 90 - (number_of_current_level / 50)) {
                     firstItem = generateRandomItem(Item.type.MYTHIC);
-                    firstItemPrice = 1800;
-                } else if (shopitem >= 40) {
+                    firstItemPrice = 5000 * number_of_current_level;
+                } else if (shopitem >= 40 - (number_of_current_level / 50)) {
                     firstItem = generateRandomItem(Item.type.RARE);
                     firstItemPrice = 600;
                 } else {
@@ -696,13 +722,13 @@ public class GameScreen implements Screen {
                     firstItemPrice = 100;
                 }
                 shopitem = MathUtils.random(100);
-                if (shopitem >= 99) {
+                if (shopitem >= 99 - (number_of_current_level / 50)) {
                     secondItem = generateRandomItem(Item.type.LEGENDARY);
-                    secondItemPrice = 3000;
-                } else if (shopitem >= 90) {
+                    secondItemPrice = 8000 * number_of_current_level;
+                } else if (shopitem >= 90 - (number_of_current_level / 50)) {
                     secondItem = generateRandomItem(Item.type.MYTHIC);
-                    secondItemPrice = 1800;
-                } else if (shopitem >= 40) {
+                    secondItemPrice = 5000 * number_of_current_level;
+                } else if (shopitem >= 40 - (number_of_current_level / 50)) {
                     secondItem = generateRandomItem(Item.type.RARE);
                     secondItemPrice = 600;
                 } else {
@@ -714,7 +740,7 @@ public class GameScreen implements Screen {
                 System.out.println(exploredRooms.size());
                 number_of_current_level++;
                 init_level_texture();
-                character.setVision(LastVsision);
+                this.character.setVision(LastVsision);
                 initGameLevel();
                 spawnCharacterInRandomRoom();
                 bosslevel = false;
@@ -821,10 +847,7 @@ public class GameScreen implements Screen {
                 // Vérifier si le clic est dans la zone de l'objet du magasin
                 if (control.mouse_click_pos.x >= itemX && control.mouse_click_pos.x <= itemX + itemWidth &&
                         control.mouse_click_pos.y >= itemY && control.mouse_click_pos.y <= itemY + itemHeight) {
-                    // Équiper l'item au personnage et fermer le magasin
-                    character.equipItem(firstItem); // Assurez-vous d'avoir une méthode d'équipement appropriée dans
-                                                    // votre
-                                                    // classe Character
+                    this.character.equipItem(firstItem);
                     shop = false;
                 }
 
@@ -843,22 +866,38 @@ public class GameScreen implements Screen {
                 // Vérifier si le clic est dans la zone de l'objet du magasin
                 if (control.mouse_click_pos.x >= itemX1 && control.mouse_click_pos.x <= itemX1 + itemWidth &&
                         control.mouse_click_pos.y >= itemY1 && control.mouse_click_pos.y <= itemY1 + itemHeight) {
-                    character.equipItem(firstItem);
-                    shop = false;
+                    if (this.character.getGold() >= firstItemPrice) {
+                        this.character.setGold(this.character.getGold() - firstItemPrice);
+                        this.character.equipItem(firstItem);
+                        shop = false;
+                    }
                 } else if (control.mouse_click_pos.x >= itemX2 && control.mouse_click_pos.x <= itemX2 + itemWidth &&
                         control.mouse_click_pos.y >= itemY2 && control.mouse_click_pos.y <= itemY2 + itemHeight) {
-                    character.equipItem(secondItem);
-                    shop = false;
+                    if (this.character.getGold() >= secondItemPrice) {
+                        this.character.setGold(this.character.getGold() - secondItemPrice);
+                        this.character.equipItem(secondItem);
+                        shop = false;
+                    }
                 } else if (control.mouse_click_pos.x >= itemX3 && control.mouse_click_pos.x <= itemX3 + itemWidth &&
-                        control.mouse_click_pos.y >= itemY3 && control.mouse_click_pos.y <= itemY3 + itemHeight) {
-                    character.setVision(character.getVision() + 10);
-                    character.setSpeed(character.getSpeed() + 10);
-                    shop = false;
+                        control.mouse_click_pos.y >= itemY3 && control.mouse_click_pos.y <= itemY3 + itemHeight
+                        && number_max_of_upgrade < 5) {
+                    if (this.character.getGold() >= 2000 * number_of_current_level) {
+                        number_max_of_upgrade++;
+                        this.character.setGold(this.character.getGold() - 2000 * number_of_current_level);
+                        this.character.setVision(this.character.getVision() + 30);
+                        this.character.setSpeed(this.character.getSpeed() + 20f);
+                        shop = false;
+                    }
                 } else if (control.mouse_click_pos.x >= itemX4 && control.mouse_click_pos.x <= itemX4 + itemWidth &&
-                        control.mouse_click_pos.y >= itemY4 && control.mouse_click_pos.y <= itemY4 + itemHeight) {
-                    character.setMaxHealth(character.getMaxHealth() + 20);
-                    character.setHealth(character.getMaxHealth());
-                    shop = false;
+                        control.mouse_click_pos.y >= itemY4 && control.mouse_click_pos.y <= itemY4 + itemHeight
+                        && number_of_upgrade_health < 5) {
+                    if (this.character.getGold() >= 2500 * number_of_current_level) {
+                        number_of_upgrade_health++;
+                        this.character.setGold(this.character.getGold() - 2500 * number_of_current_level);
+                        this.character.setMaxHealth(this.character.getMaxHealth() + 20);
+                        this.character.setHealth(this.character.getMaxHealth());
+                        shop = false;
+                    }
                 }
             }
             control.processed_click = true;
@@ -879,8 +918,8 @@ public class GameScreen implements Screen {
         camera.update();
 
         // Get the character's position
-        float characterX = character.getX();
-        float characterY = character.getY();
+        float characterX = this.character.getX();
+        float characterY = this.character.getY();
 
         // Set the camera's position to the character's position
         camera.position.set(characterX + 6, characterY + 6, 0);
@@ -900,9 +939,10 @@ public class GameScreen implements Screen {
             }
         }
 
-        if (character.getLevel() > previousLevel) {
+        if (this.character.getLevel() > previousLevel) {
             displayLevelUp = true;
-            previousLevel = character.getLevel();
+            previousLevel = this.character.getLevel();
+            Levelupsound.play(0.3f);
         }
         stateTime += delta;
 
@@ -911,8 +951,8 @@ public class GameScreen implements Screen {
             camera.unproject(touchPos);
             for (Ennemy enemy : enemies) {
                 if (enemy.getBounds().contains(touchPos.x, touchPos.y)) {
-                    enemy.takeDamage(character.getDamage());
-                    hitSound.play();
+                    enemy.takeDamage(this.character.getDamage());
+                    hitSound.play(0.5f);
                     if (!enemy.isAlive()) {
                         float monsterdrop = MathUtils.random(100f);
                         if (monsterdrop >= 70) {
@@ -943,8 +983,18 @@ public class GameScreen implements Screen {
                                 commonItem.setY(enemy.getY());
                             }
                         }
-                        enemies.remove(enemy);
-                        character.addExperience(enemy.getExperience());
+
+                        if (bosslevel) {
+                            enemies.remove(enemy);
+                            this.character.setGold(this.character.getGold()
+                                    + MathUtils.random(100 * number_of_current_level, 200 * number_of_current_level));
+                            this.character.addExperience(enemy.getExperience() * 10);
+                        } else {
+                            enemies.remove(enemy);
+                            this.character.setGold(this.character.getGold()
+                                    + MathUtils.random(10 * number_of_current_level, 20 * number_of_current_level));
+                            this.character.addExperience(enemy.getExperience());
+                        }
                     }
                     break;
                 }
@@ -962,7 +1012,7 @@ public class GameScreen implements Screen {
         // Set the uniforms for the shader
         shader_vision.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         shader_vision.setUniformf("u_center", (Gdx.graphics.getWidth() / 2) + 16, (Gdx.graphics.getHeight() / 2) - 40);
-        shader_vision.setUniformf("u_radius", shop ? 900 : character.getVision());
+        shader_vision.setUniformf("u_radius", shop ? 900 : this.character.getVision());
 
         // Render the game level with the vision shader
         renderGameLevel();
@@ -975,10 +1025,10 @@ public class GameScreen implements Screen {
 
             // Draw enemy
             if (bosslevel) {
-                enemy.update(delta, character);
+                enemy.update(delta, this.character);
                 enemy.draw(spriteBatch, 32, 32);
             } else {
-                enemy.update(delta, character);
+                enemy.update(delta, this.character);
                 enemy.draw(spriteBatch, 16, 16);
             }
         }
@@ -994,10 +1044,10 @@ public class GameScreen implements Screen {
             } else {
                 // Draw enemy
                 if (bosslevel) {
-                    enemy.update(delta, character);
+                    enemy.update(delta, this.character);
                     enemy.draw(spriteBatch, 32, 32);
                 } else {
-                    enemy.update(delta, character);
+                    enemy.update(delta, this.character);
                     enemy.draw(spriteBatch, 16, 16);
                 }
             }
@@ -1011,7 +1061,7 @@ public class GameScreen implements Screen {
         }
 
         for (Item item : droppedItems) {
-            if (character.getBounds().overlaps(item.getBounds())) {
+            if (this.character.getBounds().overlaps(item.getBounds())) {
                 itemsToEquip.add(item);
             }
         }
@@ -1020,7 +1070,7 @@ public class GameScreen implements Screen {
 
         while (iterator.hasNext()) {
             Item item = iterator.next();
-            if (character.equipItem(item)) {
+            if (this.character.equipItem(item)) {
                 droppedItems.remove(item);
             }
             iterator.remove();
@@ -1034,95 +1084,99 @@ public class GameScreen implements Screen {
 
         // update the character
         float deltaTime = Gdx.graphics.getDeltaTime();
-        character.update(deltaTime, control);
+        this.character.update(deltaTime, control);
 
         // Check for collisions with walls
         checkCollisions();
 
         // Draw the character using the actor without applying the zoom
-        character.draw(spriteBatch);
+        this.character.draw(spriteBatch);
         // Draw equipped items
-        String basePath = "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_tristan\\";
+        if (this.character.getName() != "Dims") {
+            basePath = "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_tristan\\";
+        } else {
+            basePath = "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_Dims\\";
+        }
 
         // Check if Armor is equipped
-        if (character.getEquippedItem("Armor") != null) {
-            switch (character.getEquippedItem("Armor").getRarity()) {
+        if (this.character.getEquippedItem("Armor") != null) {
+            switch (this.character.getEquippedItem("Armor").getRarity()) {
                 case 1:
-                    character.updateTexture(new Texture(basePath + "Commun\\full_armor.png"));
+                    this.character.updateTexture(new Texture(basePath + "Commun\\full_armor.png"));
                     break;
                 case 2:
-                    character.updateTexture(new Texture(basePath + "Rare\\full_armor.png"));
+                    this.character.updateTexture(new Texture(basePath + "Rare\\full_armor.png"));
                     break;
                 case 3:
-                    character.updateTexture(new Texture(basePath + "Mythique\\full_armor.png"));
+                    this.character.updateTexture(new Texture(basePath + "Mythique\\full_armor.png"));
                     break;
                 case 4:
-                    character.updateTexture(new Texture(basePath + "Legendaire\\full_armor.png"));
+                    this.character.updateTexture(new Texture(basePath + "Legendaire\\full_armor.png"));
                     break;
             }
         } else {
             // Check if Helmet and Top are both equipped
-            if (character.getEquippedItem("Helmet") != null && character.getEquippedItem("Top") != null) {
-                switch (character.getEquippedItem("Top").getRarity()) {
+            if (this.character.getEquippedItem("Helmet") != null && this.character.getEquippedItem("Top") != null) {
+                switch (this.character.getEquippedItem("Top").getRarity()) {
                     case 1:
-                        character.updateTexture(new Texture(basePath + "Commun\\full_armor.png"));
+                        this.character.updateTexture(new Texture(basePath + "Commun\\full_armor.png"));
                         break;
                     case 2:
-                        character.updateTexture(new Texture(basePath + "Rare\\full_armor.png"));
+                        this.character.updateTexture(new Texture(basePath + "Rare\\full_armor.png"));
                         break;
                     case 3:
-                        character.updateTexture(new Texture(basePath + "Mythique\\full_armor.png"));
+                        this.character.updateTexture(new Texture(basePath + "Mythique\\full_armor.png"));
                         break;
                     case 4:
-                        character.updateTexture(new Texture(basePath + "Legendaire\\full_armor.png"));
+                        this.character.updateTexture(new Texture(basePath + "Legendaire\\full_armor.png"));
                         break;
                 }
-            } else if (character.getEquippedItem("Helmet") != null && character.getEquippedItem("Top") == null
-                    && character.getEquippedItem("Armor") == null) {
+            } else if (this.character.getEquippedItem("Helmet") != null && this.character.getEquippedItem("Top") == null
+                    && this.character.getEquippedItem("Armor") == null) {
                 // Only Helmet is equipped
-                switch (character.getEquippedItem("Helmet").getRarity()) {
+                switch (this.character.getEquippedItem("Helmet").getRarity()) {
                     case 1:
-                        character.updateTexture(new Texture(basePath + "Commun\\helmet.png"));
+                        this.character.updateTexture(new Texture(basePath + "Commun\\helmet.png"));
                         break;
                     case 2:
-                        character.updateTexture(new Texture(basePath + "Rare\\helmet.png"));
+                        this.character.updateTexture(new Texture(basePath + "Rare\\helmet.png"));
                         break;
                     case 3:
-                        character.updateTexture(new Texture(basePath + "Mythique\\helmet.png"));
+                        this.character.updateTexture(new Texture(basePath + "Mythique\\helmet.png"));
                         break;
                     case 4:
-                        character.updateTexture(new Texture(basePath + "Legendaire\\helmet.png"));
+                        this.character.updateTexture(new Texture(basePath + "Legendaire\\helmet.png"));
                         break;
                 }
-            } else if (character.getEquippedItem("Top") != null && character.getEquippedItem("Helmet") == null
-                    && character.getEquippedItem("Armor") == null) {
+            } else if (this.character.getEquippedItem("Top") != null && this.character.getEquippedItem("Helmet") == null
+                    && this.character.getEquippedItem("Armor") == null) {
                 // Only Top is equipped
-                switch (character.getEquippedItem("Top").getRarity()) {
+                switch (this.character.getEquippedItem("Top").getRarity()) {
                     case 1:
-                        character.updateTexture(new Texture(basePath + "Commun\\Top.png"));
+                        this.character.updateTexture(new Texture(basePath + "Commun\\Top.png"));
                         break;
                     case 2:
-                        character.updateTexture(new Texture(basePath + "Rare\\Top.png"));
+                        this.character.updateTexture(new Texture(basePath + "Rare\\Top.png"));
                         break;
                     case 3:
-                        character.updateTexture(new Texture(basePath + "Mythique\\Top.png"));
+                        this.character.updateTexture(new Texture(basePath + "Mythique\\Top.png"));
                         break;
                     case 4:
-                        character.updateTexture(new Texture(basePath + "Legendaire\\Top.png"));
+                        this.character.updateTexture(new Texture(basePath + "Legendaire\\Top.png"));
                         break;
                 }
             }
         }
 
-        if (character.getEquippedItem("Weapon") != null) {
+        if (this.character.getEquippedItem("Weapon") != null) {
             String basePathWeapon = "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\items\\armes\\";
             Pixmap flippedPixmap = null;
             if (defaultCursor != null) {
                 defaultCursor.dispose();
             }
-            switch (character.getEquippedItem("Weapon").getRarity()) {
+            switch (this.character.getEquippedItem("Weapon").getRarity()) {
                 case 1:
-                    defaultPixmap = new Pixmap(Gdx.files.internal(basePathWeapon + "epee_rare.png"));
+                    defaultPixmap = new Pixmap(Gdx.files.internal(basePathWeapon + "epee_commun.png"));
                     flippedPixmap = new Pixmap(defaultPixmap.getWidth(), defaultPixmap.getHeight(),
                             defaultPixmap.getFormat());
                     for (int x = 0; x < defaultPixmap.getWidth(); x++) {
@@ -1201,16 +1255,16 @@ public class GameScreen implements Screen {
         font.draw(uiBatch, "StatSheet", 60, 140);
         // Health
         uiBatch.draw(health, 20, 60, 32, 32);
-        font.draw(uiBatch, String.valueOf(character.getHealth()), 60, 85);
+        font.draw(uiBatch, String.valueOf(this.character.getHealth()), 60, 85);
         // Armor
         uiBatch.draw(shield, 24, 22, 24, 24);
-        font.draw(uiBatch, String.valueOf(character.getArmor()), 60, 45);
+        font.draw(uiBatch, String.valueOf(this.character.getArmor()), 60, 45);
         // Experience (XP)
         uiBatch.draw(xp, 520, 60, 32, 32);
-        font.draw(uiBatch, character.percentageToNextLevel() + "%", 560, 85);
+        font.draw(uiBatch, this.character.percentageToNextLevel() + "%", 560, 85);
         // Gold
         uiBatch.draw(gold, 120, 20, 32, 32);
-        font.draw(uiBatch, String.valueOf(character.getGold()), 160, 45);
+        font.draw(uiBatch, String.valueOf(this.character.getGold()), 160, 45);
 
         // FightSheet Title
         font.draw(uiBatch, "FightSheet", 460, 140);
@@ -1222,9 +1276,9 @@ public class GameScreen implements Screen {
         font.draw(uiBatch, String.valueOf(number_of_current_level), 460, 45);
         // Damage
         uiBatch.draw(damageTexture, 120, 60, 32, 32);
-        font.draw(uiBatch, String.valueOf(character.getDamage()), 160, 85);
+        font.draw(uiBatch, String.valueOf(this.character.getDamage()), 160, 85);
         // Level
-        font.draw(uiBatch, "Level: " + character.getLevel(), 525, 40);
+        font.draw(uiBatch, "Level: " + this.character.getLevel(), 525, 40);
 
         uiBatch.draw(inventory, (Gdx.graphics.getWidth() / 2.05f) - 96, 5, 64, 64);
         uiBatch.draw(inventory, (Gdx.graphics.getWidth() / 2.05f - 32), 5, 64, 64);
@@ -1232,10 +1286,10 @@ public class GameScreen implements Screen {
         uiBatch.draw(inventory, (Gdx.graphics.getWidth() / 2.05f) + 96, 5, 64, 64);
 
         // Récupérez les items équipés
-        Item equippedWeapon = character.getEquippedItem("Weapon");
-        Item equippedArmor = character.getEquippedItem("Armor");
-        Item equippedTop = character.getEquippedItem("Top");
-        Item equippedHelmet = character.getEquippedItem("Helmet");
+        Item equippedWeapon = this.character.getEquippedItem("Weapon");
+        Item equippedArmor = this.character.getEquippedItem("Armor");
+        Item equippedTop = this.character.getEquippedItem("Top");
+        Item equippedHelmet = this.character.getEquippedItem("Helmet");
 
         // Dessinez les textures des items équipés
         if (equippedWeapon != null) {
@@ -1266,21 +1320,26 @@ public class GameScreen implements Screen {
                         Gdx.graphics.getHeight() / 2.6f);
                 uiBatch.draw(first_item_texture, Gdx.graphics.getWidth() / 3.05f,
                         Gdx.graphics.getHeight() / 4.5f, 100, 100);
-                font.draw(uiBatch, String.valueOf(firstItemPrice + " gold"), Gdx.graphics.getWidth() / 3.05f,
+                font.draw(uiBatch, String.valueOf((int) firstItemPrice + " gold"),
+                        Gdx.graphics.getWidth() / 3.05f,
                         Gdx.graphics.getHeight() / 5.2f);
                 uiBatch.draw(second_item_texture, Gdx.graphics.getWidth() / 2.4f,
                         Gdx.graphics.getHeight() / 4.5f, 100, 100);
-                font.draw(uiBatch, String.valueOf(secondItemPrice + " gold"), Gdx.graphics.getWidth() / 2.4f,
+                font.draw(uiBatch, String.valueOf((int) secondItemPrice + " gold"),
+                        Gdx.graphics.getWidth() / 2.4f,
                         Gdx.graphics.getHeight() / 5.2f);
                 uiBatch.draw(VisionIcon, Gdx.graphics.getWidth() / 1.9f, Gdx.graphics.getHeight() / 4.5f, 100,
                         100);
-                font.draw(uiBatch, "+10 speed&Vision\n        600 gold", Gdx.graphics.getWidth() / 2f,
+                float upgrade_Vision = 2500 * number_of_current_level;
+                font.draw(uiBatch, "+10 speed&Vision\n        " + (int) upgrade_Vision + " gold",
+                        Gdx.graphics.getWidth() / 2f,
                         Gdx.graphics.getHeight() / 4.9f);
                 uiBatch.draw(Healthpotion, Gdx.graphics.getWidth() / 1.57f, Gdx.graphics.getHeight() / 4.5f, 90,
                         90);
                 font.draw(uiBatch, "Get treated", Gdx.graphics.getWidth() / 1.6f,
                         Gdx.graphics.getHeight() / 3f);
-                font.draw(uiBatch, "+20 HP max\n1000 gold", Gdx.graphics.getWidth() / 1.6f,
+                float upgrade_health = 2000 * number_of_current_level;
+                font.draw(uiBatch, "+20 HP max\n" + (int) upgrade_health + " gold", Gdx.graphics.getWidth() / 1.6f,
                         Gdx.graphics.getHeight() / 4.9f);
             }
         }
@@ -1292,6 +1351,21 @@ public class GameScreen implements Screen {
         if (displayLevelUp) {
             font.draw(uiBatch, "Level Up!", Gdx.graphics.getWidth() / 2 - 32, Gdx.graphics.getHeight() / 2 + 100);
         }
+        if (!this.character.isAlive()) {
+            isGameOver = true;
+        }
+
+        if (isGameOver) {
+            stage.getBatch().begin();
+            stage.getBatch().draw(gameOverTexture, Gdx.graphics.getWidth() / 2f - gameOverTexture.getWidth() / 2f,
+                    Gdx.graphics.getHeight() / 2f - gameOverTexture.getHeight() / 2f);
+            stage.getBatch().end();
+
+            if (Gdx.input.justTouched()) {
+                game.setScreen(new MainMenu(game));
+            }
+        }
+
         uiBatch.end();
     }
 
@@ -1301,6 +1375,7 @@ public class GameScreen implements Screen {
             drawRoomWalls(spriteBatch, walls, room);
             drawdoor(spriteBatch, room);
         }
+
     }
 
     @Override
@@ -1336,6 +1411,8 @@ public class GameScreen implements Screen {
         spriteBatch.dispose();
         shader_vision.dispose();
         shapeRenderer.dispose();
-        character.getTexture().dispose();
+        this.character.getTexture().dispose();
+        stage.dispose();
+        gameOverTexture.dispose();
     }
 }
