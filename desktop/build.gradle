@@ -1,9 +1,9 @@
 sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
-sourceSets.main.resources.srcDirs = ["../assets"]
+sourceSets.main.resources.srcDirs = ["..\\core\\src\\com\\pedagoquest\\game\\assets"]
 
 project.ext.mainClassName = "com.pedagoquest.game.DesktopLauncher"
-project.ext.assetsDir = new File("../assets")
+project.ext.assetsDir = new File("..\\core\\src\\com\\pedagoquest\\game\\assets")
 
 import org.gradle.internal.os.OperatingSystem
 
@@ -47,3 +47,8 @@ tasks.register('dist', Jar) {
 dist.dependsOn classes
 
 eclipse.project.name = appName + "-desktop"
+
+dependencies {
+    implementation project(":core")
+    // autres dépendances...
+}
