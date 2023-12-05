@@ -881,9 +881,9 @@ public class GameScreen implements Screen {
                 } else if (control.mouse_click_pos.x >= itemX3 && control.mouse_click_pos.x <= itemX3 + itemWidth &&
                         control.mouse_click_pos.y >= itemY3 && control.mouse_click_pos.y <= itemY3 + itemHeight
                         && number_max_of_upgrade < 5) {
-                    if (this.character.getGold() >= 2000 * number_of_current_level) {
+                    if (this.character.getGold() >= 2500 * number_of_current_level) {
                         number_max_of_upgrade++;
-                        this.character.setGold(this.character.getGold() - 2000 * number_of_current_level);
+                        this.character.setGold(this.character.getGold() - 2500 * number_of_current_level);
                         this.character.setVision(this.character.getVision() + 30);
                         this.character.setSpeed(this.character.getSpeed() + 20f);
                         shop = false;
@@ -891,9 +891,9 @@ public class GameScreen implements Screen {
                 } else if (control.mouse_click_pos.x >= itemX4 && control.mouse_click_pos.x <= itemX4 + itemWidth &&
                         control.mouse_click_pos.y >= itemY4 && control.mouse_click_pos.y <= itemY4 + itemHeight
                         && number_of_upgrade_health < 5) {
-                    if (this.character.getGold() >= 2500 * number_of_current_level) {
+                    if (this.character.getGold() >= 2000 * number_of_current_level) {
                         number_of_upgrade_health++;
-                        this.character.setGold(this.character.getGold() - 2500 * number_of_current_level);
+                        this.character.setGold(this.character.getGold() - 2000 * number_of_current_level);
                         this.character.setMaxHealth(this.character.getMaxHealth() + 20);
                         this.character.setHealth(this.character.getMaxHealth());
                         shop = false;
