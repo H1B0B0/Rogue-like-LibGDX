@@ -19,23 +19,23 @@ public class Boss extends Ennemy {
         // Load different sprites based on boss name
         switch (name.toLowerCase()) {
             case "gobelin":
-                enemySprite = new Texture("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_mob\\gobelin\\boss_gobelin.png");
+                enemySprite = new Texture("core/src/com/pedagoquest/game/assets/sprite/sprite_mob/gobelin/boss_gobelin.png");
                 System.out.println("Loading boss_gobelin.png");
                 break;
             case "orc":
-                enemySprite = new Texture("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_mob\\orc\\boss_orc.png");
+                enemySprite = new Texture("core/src/com/pedagoquest/game/assets/sprite/sprite_mob/orc/boss_orc.png");
                 System.out.println("Loading boss_orc.png");
                 break;
             case "zombie":
-                enemySprite = new Texture("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_mob\\zombie\\boss_zombie.png");
+                enemySprite = new Texture("core/src/com/pedagoquest/game/assets/sprite/sprite_mob/zombie/boss_zombie.png");
                 System.out.println("Loading boss_zombie.png");
                 break;
             case "squelette":
-                enemySprite = new Texture("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_mob\\squelette\\boss_squelette.png");
+                enemySprite = new Texture("core/src/com/pedagoquest/game/assets/sprite/sprite_mob/squelette/boss_squelette.png");
                 System.out.println("Loading boss_squelette.png");
                 break;
             default:
-                enemySprite = new Texture("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_mob\\gobelin\\boss_gobelin.png");
+                enemySprite = new Texture("core/src/com/pedagoquest/game/assets/sprite/sprite_mob/gobelin/boss_gobelin.png");
                 System.out.println("Loading default boss_gobelin.png");
                 break;
         }
