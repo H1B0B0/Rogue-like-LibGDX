@@ -68,9 +68,9 @@ public class Character {
     private boolean isFlashing = false;
     private Color flashingColor = new Color(1, 1, 1, 0.5f); // White color with some transparency
     private Sound deathSound = Gdx.audio.newSound(
-            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\burning.mp3"));
+            Gdx.files.internal("core/src/com/pedagoquest/game/assets/sprite/map/sounds/burning.mp3"));
     private Sound Stepsound = Gdx.audio.newSound(
-            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\step.mp3"));
+            Gdx.files.internal("core/src/com/pedagoquest/game/assets/sprite/map/sounds/step.mp3"));
     private int stepCounter = 0;
     private int stepsPerSound = 23;
 

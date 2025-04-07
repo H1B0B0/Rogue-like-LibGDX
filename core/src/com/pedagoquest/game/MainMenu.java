@@ -30,7 +30,7 @@ public class MainMenu extends ScreenAdapter {
     private final TextButton PersonnageButton;
 
     public MainMenu(final Game game) {
-        this.background = new Texture("core/src/com/pedagoquest/game/assets/sprite/menu/Pedagoquest_back.png");
+        this.background = new Texture("core/src/com/pedagoquest/game/assets/sprite/menu/pedagoquest_back.png");
 
         stage = new Stage(new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         Gdx.input.setInputProcessor(stage);
@@ -96,11 +96,11 @@ public class MainMenu extends ScreenAdapter {
                 clickSound.play(); // Jouer le son de clic
                 if (PersonnageButton.getText().toString().equals("Click to play with Tristan")) {
                     Texture charactTexture = new Texture(
-                            "core/src/com/pedagoquest/game/assets/sprite/sprite_dims/naked/Naked.png");
+                            "core/src/com/pedagoquest/game/assets/sprite/sprite_dims/naked/naked.png");
                     character = new Character("Dims", 1, 80, 100, 7, 6, 10, 10, 20, charactTexture);
                 } else {
                     Texture charactTexture = new Texture(
-                            "core/src/com/pedagoquest/game/assets/sprite/sprite_tristan/naked/Naked.png");
+                            "core/src/com/pedagoquest/game/assets/sprite/sprite_tristan/naked/naked.png");
                     character = new Character("Tristan", 1, 100, 100, 7, 10, 10, 10, 10, charactTexture);
                 }
                 game.setScreen(new GameScreen((GameController) game, character));

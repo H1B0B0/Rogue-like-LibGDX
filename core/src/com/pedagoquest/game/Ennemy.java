@@ -58,19 +58,19 @@ public class Ennemy {
         switch (name.toLowerCase()) {
             case "gobelin":
                 enemySprite = new Texture(
-                        "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_mob\\gobelin\\gobelin.png");
+                        "core/src/com/pedagoquest/game/assets/sprite/sprite_mob/gobelin/gobelin.png");
                 break;
             case "orc":
                 enemySprite = new Texture(
-                        "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_mob\\orc\\orc.png");
+                        "core/src/com/pedagoquest/game/assets/sprite/sprite_mob/orc/orc.png");
                 break;
             case "zombie":
                 enemySprite = new Texture(
-                        "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_mob\\zombie\\zombie.png");
+                        "core/src/com/pedagoquest/game/assets/sprite/sprite_mob/zombie/zombie.png");
                 break;
             case "squelette":
                 enemySprite = new Texture(
-                        "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_mob\\squelette\\squelette.png");
+                        "core/src/com/pedagoquest/game/assets/sprite/sprite_mob/squelette/squelette.png");
                 break;
             default:
                 // Default sprite in case of an unrecognized name

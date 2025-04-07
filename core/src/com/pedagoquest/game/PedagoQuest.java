@@ -31,7 +31,7 @@ public class PedagoQuest extends Game {
         Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
         shapeRenderer = new ShapeRenderer(); // Initialisation de shapeRenderer
         spriteBatch = new SpriteBatch(); // Initialisation de spriteBatch
-        texture = new Texture("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_tristan\\naked\\naked.png"); // Initialisation de characterSprite
+        texture = new Texture("core/src/com/pedagoquest/game/assets/sprite/sprite_tristan/naked/naked.png"); // Initialisation de characterSprite
         Character = new TextureRegion(texture, 32, 0, 32, 32);
         OrthographicCamera camera = new OrthographicCamera();
         control = new Control(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);

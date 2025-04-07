@@ -58,23 +58,23 @@ public class GameScreen implements Screen {
     private boolean shoproom = false;
     private List<Item> itemsToEquip = new ArrayList<>();
     private Texture health = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\hp\\hp.png");
+            "core/src/com/pedagoquest/game/assets/sprite/assets_personnage/hp/hp.png");
     private Texture shield = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\shield\\shield.png");
+            "core/src/com/pedagoquest/game/assets/sprite/assets_personnage/shield/shield.png");
     private Texture inventory = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\interfaces\\locked_badge.png");
+            "core/src/com/pedagoquest/game/assets/sprite/map/interfaces/locked_badge.png");
     private Texture xp = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\Stats\\Xp.png");
+            "core/src/com/pedagoquest/game/assets/sprite/assets_personnage/stats/xp.png");
     private Texture remainEnnemies = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\Stats\\Ennemies.png");
+            "core/src/com/pedagoquest/game/assets/sprite/assets_personnage/stats/ennemies.png");
     private Texture gold = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\Stats\\Gold.png");
+            "core/src/com/pedagoquest/game/assets/sprite/assets_personnage/stats/gold.png");
     private Texture floor = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\Stats\\Floor.png");
+            "core/src/com/pedagoquest/game/assets/sprite/assets_personnage/stats/floor.png");
     private Texture damageTexture = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\Stats\\Attack.png");
+            "core/src/com/pedagoquest/game/assets/sprite/assets_personnage/stats/attack.png");
     private Texture shopPanel = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\savedGame_Panel.png");
+            "core/src/com/pedagoquest/game/assets/sprite/map/menu/savedgame_panel.png");
     private ShaderProgram shader_vision;
     private FreeTypeFontGenerator generator;
     private BitmapFont font;
@@ -88,20 +88,20 @@ public class GameScreen implements Screen {
     private boolean displayLevelUp = false;
     private SpriteBatch uiBatch = new SpriteBatch();
     private Sound hitSound = Gdx.audio.newSound(
-            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\hit_slash.mp3"));
+            Gdx.files.internal("core/src/com/pedagoquest/game/assets/sprite/map/sounds/hit_slash.mp3"));
     private Sound BossSound = Gdx.audio.newSound(
-            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\boss.mp3"));
+            Gdx.files.internal("core/src/com/pedagoquest/game/assets/sprite/map/sounds/boss.mp3"));
     private Sound Levelupsound = Gdx.audio.newSound(
-            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\levelup.mp3"));
+            Gdx.files.internal("core/src/com/pedagoquest/game/assets/sprite/map/sounds/levelup.mp3"));
     private Sound tpSound = Gdx.audio.newSound(
-            Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\sounds\\door_open.mp3"));
+            Gdx.files.internal("core/src/com/pedagoquest/game/assets/sprite/map/sounds/door_open.mp3"));
     private boolean shop = false;
     private Texture shopTexture = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\shop4x.png");
+            "core/src/com/pedagoquest/game/assets/sprite/map/menu/shop4x.png");
     private Texture Healthpotion = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\Conso_1.png");
+            "core/src/com/pedagoquest/game/assets/sprite/map/menu/conso_1.png");
     private Texture VisionIcon = new Texture(
-            "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\menu\\eye_fire1.png");
+            "core/src/com/pedagoquest/game/assets/sprite/map/menu/eye_fire1.png");
     private TextureRegion[][] attackFrames;
     private GameController game;
     private Animation<TextureRegion> attackAnimation;
@@ -141,12 +141,12 @@ public class GameScreen implements Screen {
         control = new Control(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
         spawnCharacterInRandomRoom();
         Gdx.input.setInputProcessor(control);
-        shader_vision = new ShaderProgram(Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\fade_shader.vert"),
-                Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\VisionShader.glsl"));
+        shader_vision = new ShaderProgram(Gdx.files.internal("core/src/com/pedagoquest/game/fade_shader.vert"),
+                Gdx.files.internal("core/src/com/pedagoquest/game/VisionShader.glsl"));
 
         // Load the font file
         generator = new FreeTypeFontGenerator(
-                Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\fonts\\pixel_font.ttf"));
+                Gdx.files.internal("core/src/com/pedagoquest/game/assets/sprite/map/fonts/pixel_font.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 
         // Set font size
@@ -155,10 +155,10 @@ public class GameScreen implements Screen {
         // Generate the font
         font = generator.generateFont(parameter);
 
-        gameOverTexture = new Texture("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\menu\\deadback.png");
+        gameOverTexture = new Texture("core/src/com/pedagoquest/game/assets/sprite/menu/deadback.png");
 
         Texture attackTexture = new Texture(Gdx.files.internal(
-                "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\assets_personnage\\attack\\Retro Impact Effect F.png"));
+                "core/src/com/pedagoquest/game/assets/sprite/assets_personnage/attack/retro_impact_effect_f.png"));
 
         // Découper l'image en régions de texture
         attackFrames = TextureRegion.split(attackTexture, 64, 64);
@@ -236,7 +236,7 @@ public class GameScreen implements Screen {
     private void setDefaultCursor() {
         // Original cursor image
         Pixmap originalPixmap = new Pixmap(
-                Gdx.files.internal("core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\gdx\\cursor_mouse.png"));
+                Gdx.files.internal("core/src/com/pedagoquest/game/assets/sprite/map/gdx/cursor_mouse.png"));
 
         // New dimensions for the cursor
         int newWidth = 16; // For example, double the original size
@@ -265,7 +265,7 @@ public class GameScreen implements Screen {
         switch (MathUtils.random(0, 4)) {
             case 0:
                 texture = new Texture(
-                        "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\environment\\tiles_caves.png");
+                        "core/src/com/pedagoquest/game/assets/sprite/map/environment/tiles_caves.png");
                 ground = new TextureRegion(texture, 0, 0, 16, 16);
                 ground1 = new TextureRegion(texture, 16, 0, 16, 16);
                 ground2 = new TextureRegion(texture, 32, 0, 16, 16);
@@ -276,7 +276,7 @@ public class GameScreen implements Screen {
                 break;
             case 1:
                 texture = new Texture(
-                        "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\environment\\tiles_city.png");
+                        "core/src/com/pedagoquest/game/assets/sprite/map/environment/tiles_city.png");
                 ground = new TextureRegion(texture, 0, 0, 16, 16);
                 ground1 = new TextureRegion(texture, 16, 0, 16, 16);
                 ground2 = new TextureRegion(texture, 32, 0, 16, 16);
@@ -287,7 +287,7 @@ public class GameScreen implements Screen {
                 break;
             case 2:
                 texture = new Texture(
-                        "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\environment\\tiles_halls.png");
+                        "core/src/com/pedagoquest/game/assets/sprite/map/environment/tiles_halls.png");
                 ground = new TextureRegion(texture, 0, 0, 16, 16);
                 ground1 = new TextureRegion(texture, 16, 0, 16, 16);
                 ground2 = new TextureRegion(texture, 32, 0, 16, 16);
@@ -298,7 +298,7 @@ public class GameScreen implements Screen {
                 break;
             case 3:
                 texture = new Texture(
-                        "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\environment\\tiles_prison.png");
+                        "core/src/com/pedagoquest/game/assets/sprite/map/environment/tiles_prison.png");
                 ground = new TextureRegion(texture, 0, 0, 16, 16);
                 ground1 = new TextureRegion(texture, 16, 0, 16, 16);
                 ground2 = new TextureRegion(texture, 32, 0, 16, 16);
@@ -309,7 +309,7 @@ public class GameScreen implements Screen {
                 break;
             case 4:
                 texture = new Texture(
-                        "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\map\\environment\\tiles_sewers.png");
+                        "core/src/com/pedagoquest/game/assets/sprite/map/environment/tiles_sewers.png");
                 ground = new TextureRegion(texture, 0, 0, 16, 16);
                 ground1 = new TextureRegion(texture, 16, 0, 16, 16);
                 ground2 = new TextureRegion(texture, 32, 0, 16, 16);
@@ -1087,25 +1087,25 @@ public class GameScreen implements Screen {
         this.character.draw(spriteBatch);
         // Draw equipped items
         if (this.character.getName() != "Dims") {
-            basePath = "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_tristan\\";
+            basePath = "core/src/com/pedagoquest/game/assets/sprite/sprite_tristan/";
         } else {
-            basePath = "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\sprite_Dims\\";
+            basePath = "core/src/com/pedagoquest/game/assets/sprite/sprite_dims/";
         }
 
         // Check if Armor is equipped
         if (this.character.getEquippedItem("Armor") != null) {
             switch (this.character.getEquippedItem("Armor").getRarity()) {
                 case 1:
-                    this.character.updateTexture(new Texture(basePath + "Commun\\full_armor.png"));
+                    this.character.updateTexture(new Texture(basePath + "commun/full_armor.png"));
                     break;
                 case 2:
-                    this.character.updateTexture(new Texture(basePath + "Rare\\full_armor.png"));
+                    this.character.updateTexture(new Texture(basePath + "rare/full_armor.png"));
                     break;
                 case 3:
-                    this.character.updateTexture(new Texture(basePath + "Mythique\\full_armor.png"));
+                    this.character.updateTexture(new Texture(basePath + "mythique/full_armor.png"));
                     break;
                 case 4:
-                    this.character.updateTexture(new Texture(basePath + "Legendaire\\full_armor.png"));
+                    this.character.updateTexture(new Texture(basePath + "legendaire/full_armor.png"));
                     break;
             }
         } else {
@@ -1113,16 +1113,16 @@ public class GameScreen implements Screen {
             if (this.character.getEquippedItem("Helmet") != null && this.character.getEquippedItem("Top") != null) {
                 switch (this.character.getEquippedItem("Top").getRarity()) {
                     case 1:
-                        this.character.updateTexture(new Texture(basePath + "Commun\\full_armor.png"));
+                        this.character.updateTexture(new Texture(basePath + "commun/full_armor.png"));
                         break;
                     case 2:
-                        this.character.updateTexture(new Texture(basePath + "Rare\\full_armor.png"));
+                        this.character.updateTexture(new Texture(basePath + "rare/full_armor.png"));
                         break;
                     case 3:
-                        this.character.updateTexture(new Texture(basePath + "Mythique\\full_armor.png"));
+                        this.character.updateTexture(new Texture(basePath + "mythique/full_armor.png"));
                         break;
                     case 4:
-                        this.character.updateTexture(new Texture(basePath + "Legendaire\\full_armor.png"));
+                        this.character.updateTexture(new Texture(basePath + "legendaire/full_armor.png"));
                         break;
                 }
             } else if (this.character.getEquippedItem("Helmet") != null && this.character.getEquippedItem("Top") == null
@@ -1130,16 +1130,16 @@ public class GameScreen implements Screen {
                 // Only Helmet is equipped
                 switch (this.character.getEquippedItem("Helmet").getRarity()) {
                     case 1:
-                        this.character.updateTexture(new Texture(basePath + "Commun\\helmet.png"));
+                        this.character.updateTexture(new Texture(basePath + "commun/helmet.png"));
                         break;
                     case 2:
-                        this.character.updateTexture(new Texture(basePath + "Rare\\helmet.png"));
+                        this.character.updateTexture(new Texture(basePath + "rare/helmet.png"));
                         break;
                     case 3:
-                        this.character.updateTexture(new Texture(basePath + "Mythique\\helmet.png"));
+                        this.character.updateTexture(new Texture(basePath + "mythique/helmet.png"));
                         break;
                     case 4:
-                        this.character.updateTexture(new Texture(basePath + "Legendaire\\helmet.png"));
+                        this.character.updateTexture(new Texture(basePath + "legendaire/helmet.png"));
                         break;
                 }
             } else if (this.character.getEquippedItem("Top") != null && this.character.getEquippedItem("Helmet") == null
@@ -1147,23 +1147,23 @@ public class GameScreen implements Screen {
                 // Only Top is equipped
                 switch (this.character.getEquippedItem("Top").getRarity()) {
                     case 1:
-                        this.character.updateTexture(new Texture(basePath + "Commun\\Top.png"));
+                        this.character.updateTexture(new Texture(basePath + "commun/top.png"));
                         break;
                     case 2:
-                        this.character.updateTexture(new Texture(basePath + "Rare\\Top.png"));
+                        this.character.updateTexture(new Texture(basePath + "rare/top.png"));
                         break;
                     case 3:
-                        this.character.updateTexture(new Texture(basePath + "Mythique\\Top.png"));
+                        this.character.updateTexture(new Texture(basePath + "mythique/top.png"));
                         break;
                     case 4:
-                        this.character.updateTexture(new Texture(basePath + "Legendaire\\Top.png"));
+                        this.character.updateTexture(new Texture(basePath + "legendaire/top.png"));
                         break;
                 }
             }
         }
 
         if (this.character.getEquippedItem("Weapon") != null) {
-            String basePathWeapon = "core\\src\\com\\pedagoquest\\game\\assets\\sprite\\items\\armes\\";
+            String basePathWeapon = "core/src/com/pedagoquest/game/assets/sprite/items/armes/";
             Pixmap flippedPixmap = null;
             if (defaultCursor != null) {
                 defaultCursor.dispose();
